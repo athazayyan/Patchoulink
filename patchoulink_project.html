@@ -3,62 +3,78 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PatchouLink — Project PDF Viewer</title>
+  <title>PatchouLink — Project Nilam PDF Viewer</title>
   <style>
     :root{
-      --bg:#f6faf6;
-      --green:#1f7a4c;
-      --muted:#556078;
+      --bg: linear-gradient(135deg, #f0f8f0 0%, #e8f5e8 100%);
+      --green: #1f7a4c;
+      --green-light: #90EE90;
+      --earth: #8B4513;
+      --muted: #556078;
       font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
     }
     html,body{height:100%;margin:0}
     body{display:flex;flex-direction:column;background:var(--bg);color:#0b2530}
     .header{
       display:flex;align-items:center;gap:16px;padding:14px 18px;
-      background:linear-gradient(90deg,#eaf6ec,#f7fff7);
-      border-bottom:1px solid rgba(0,0,0,0.04);
+      background:linear-gradient(90deg, #e8f5e8, #f0f8f0);
+      border-bottom:2px solid var(--green-light);
+      position: relative;
     }
-    .logo{width:44px;height:44px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+    .header::before {
+      content: '🌿';
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 24px;
+      opacity: 0.6;
+    }
+    .logo{width:44px;height:44px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;font-weight:700}
     .title{font-size:16px;margin:0}
     .subtitle{color:var(--muted);font-size:13px;margin:2px 0 0}
-    .controls{display:flex;gap:8px;align-items:center;padding:12px 18px}
-    .btn{background:var(--green);color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600;font-size:13px}
-    .btn.secondary{background:#fff;color:var(--green);border:1px solid rgba(31,122,76,0.12)}
+    .controls{display:flex;gap:8px;align-items:center;padding:12px 18px;background:rgba(232,245,232,0.6);border-bottom:1px solid rgba(31,122,76,0.1)}
+    .btn{background:var(--green);color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600;font-size:13px;position:relative;transition:background 0.2s}
+    .btn:hover{background:#186a3e}
+    .btn.secondary{background:#fff;color:var(--green);border:1px solid rgba(31,122,76,0.2)}
+    .btn.secondary:hover{border-color:var(--green)}
     .viewer-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:8px 12px}
     .pdf-frame{
       width:100%;
-      height:calc(100vh - 160px); /* header + controls + footer approx 160px */
-      border:1px solid #e6efe6;
-      border-radius:8px;
-      box-shadow:0 6px 18px rgba(0,0,0,0.06);
+      height:calc(100vh - 160px);
+      border:1px solid #d4edda;
+      border-radius:12px;
+      box-shadow:0 8px 24px rgba(31,122,76,0.12);
       background:#fff;
     }
-    .note{padding:12px 18px;color:var(--muted);font-size:13px;text-align:center}
-    footer{padding:12px 18px;text-align:center;color:var(--muted);font-size:12px}
+    .note{padding:12px 18px;color:var(--muted);font-size:13px;text-align:center;background:rgba(232,245,232,0.4);border-radius:8px;margin:0 12px}
+    .note::before {content: '🌿 '; }
+    footer{padding:12px 18px;text-align:center;color:var(--muted);font-size:12px;background:rgba(240,248,240,0.8);border-top:1px solid rgba(31,122,76,0.1)}
+    footer::after {content: ' 🌿'; }
     @media (max-width:720px){
       .pdf-frame{height:calc(100vh - 200px)}
+      .header::before {right:10px; font-size:20px;}
     }
   </style>
 </head>
 <body>
   <header class="header">
-    <div class="logo">PL</div>
+    <div class="logo">🌿</div>
     <div>
-      <h1 class="title">PatchouLink — Project PDF Viewer</h1>
-      <div class="subtitle">Pastikan file <code>patchoulink_project.pdf</code> berada di folder yang sama dengan file HTML ini.</div>
+      <h1 class="title">PatchouLink — Project Nilam</h1>
+      <p class="subtitle">PDF Viewer Pertanian Nilam</p>
     </div>
   </header>
 
   <div class="controls">
     <a class="btn" id="openBtn" target="_blank" rel="noopener">Open in new tab</a>
     <a class="btn secondary" id="downloadBtn" download>Download PDF</a>
-    <a class="btn secondary" id="showRawBtn" target="_blank" rel="noopener">Open raw PDF (fallback)</a>
+    <a class="btn secondary" id="showRawBtn" target="_blank" rel="noopener">Open raw PDF</a>
     <div style="flex:1"></div>
-    <div style="font-size:13px;color:var(--muted)">File: <strong id="filename">patchoulink_project.pdf</strong></div>
+    <div style="font-size:13px;color:var(--muted)">File: <strong id="filename">patchoulink_project.pdf</strong> 🌿</div>
   </div>
 
   <main class="viewer-wrap">
-    <!-- We use iframe with viewer parameters to force "page-width" fit in most browsers -->
     <iframe id="pdfFrame" class="pdf-frame" sandbox="allow-same-origin allow-scripts"></iframe>
   </main>
 
@@ -76,10 +92,9 @@
   document.getElementById('filename').textContent = pdfFilename;
 
   // Many browsers support URL parameters for PDF viewer:
-  // '#zoom=page-width' or '#zoom=100' ; '#toolbar=0' hides toolbar in some viewers
   const viewerParams = '#view=FitH&toolbar=0&navpanes=0&zoom=page-width';
 
-  // Set iframe src to try PDF.js-friendly pattern first (relative path + params)
+  // Set iframe src
   iframe.src = pdfFilename + viewerParams;
 
   // Buttons
@@ -87,7 +102,7 @@
   downloadBtn.href = pdfFilename;
   showRawBtn.href = pdfFilename;
 
-  // As fallback: if iframe failed to load (some browsers block), we try to replace with <embed>
+  // Fallback to embed
   iframe.addEventListener('error', () => {
     const wrap = iframe.parentNode;
     const embed = document.createElement('embed');
@@ -96,8 +111,6 @@
     embed.className = 'pdf-frame';
     wrap.replaceChild(embed, iframe);
   });
-
-  // Extra: if PDF is very small (white margins), user likely needs different PDF layout.
 </script>
 </body>
 </html>
